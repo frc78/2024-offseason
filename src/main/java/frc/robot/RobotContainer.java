@@ -11,6 +11,8 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -31,6 +33,7 @@ public class RobotContainer {
                                                                // driving in open loop
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+  private final SwerveRequest.SysIdSwerveTranslation sysTranslate = new SwerveRequest.SysIdSwerveTranslation().withVolts(Units.Volts.of(10));
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -48,6 +51,8 @@ public class RobotContainer {
 
     // reset the field-centric heading on left bumper press
     joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
+    
+    joystick.x().whileTrue(drivetrain.applyRequest(() -> sysTranslate));
 
     if (Utils.isSimulation()) {
       drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
